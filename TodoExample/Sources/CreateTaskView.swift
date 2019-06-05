@@ -1,0 +1,55 @@
+//
+//  CreateTaskView.swift
+//  TodoExample
+//
+//  Created by suguru-kishimoto on 2019/06/05.
+//  Copyright © 2019 suguru-kishimoto. All rights reserved.
+//
+
+import SwiftUI
+
+struct CreateTaskView : View {
+    @EnvironmentObject private var taskData: TaskData
+    @State private var draftText: String = ""
+    @State private var selectedColor: TaskColor = TaskColor.default
+    var body: some View {
+        VStack {
+            HStack {
+                VStack(alignment: .leading) {
+                    TextField($draftText, placeholder: Text("Create a new task..."))
+
+                    HStack {
+                        ForEach(TaskColor.allCases.identified(by: \.self)) { c in
+                            Image(systemName: c == self.selectedColor ? "circle.fill" : "circle")
+                                .foregroundColor(c.color)
+                                .tapAction { self.selectedColor = c }
+                        }
+                    }
+                }
+
+                Image(systemName: "plus.circle").imageScale(.large)
+                    .tapAction {
+                        guard !self.draftText.isEmpty else {
+                            return
+                        }
+                        self.taskData.create(text: self.draftText, color: self.selectedColor)
+                        self.clear()
+                }
+            }
+        }
+        .padding()
+    }
+
+    private func clear() {
+        draftText = ""
+        selectedColor = TaskColor.default
+    }
+}
+
+#if DEBUG
+struct CreateTaskView_Previews : PreviewProvider {
+    static var previews: some View {
+        CreateTaskView()
+    }
+}
+#endif
